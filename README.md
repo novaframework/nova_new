@@ -1,21 +1,16 @@
-# NovaNew
+## mix nova.new
 
-**TODO: Add description**
+Provides `nova.new` installer as an archive.
 
-## Installation
+To install from Hex, run:
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `nova_new` to your list of dependencies in `mix.exs`:
+    $ mix archive.install hex nova_new
 
-```elixir
-def deps do
-  [
-    {:nova_new, "~> 0.1.0"}
-  ]
-end
-```
+To build and install it locally,
+ensure any previous archive versions are removed:
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/nova_new>.
+    $ mix archive.uninstall nova_new
 
+Then run:
+
+    $ mix do archive.build, archive.install
