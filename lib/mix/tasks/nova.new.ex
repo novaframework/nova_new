@@ -8,7 +8,9 @@ defmodule Mix.Tasks.Nova.New do
   @elixir_version "1.15.0"
 
   @flags [
-    app: :string
+    app: :string,
+    ecto: :boolean,
+    ecto_adapter: :string
   ]
 
   @shortdoc "Generates a Nova router file"
@@ -31,7 +33,9 @@ defmodule Mix.Tasks.Nova.New do
     case {opts, argv} do
       {_opts, []} ->
         Mix.Tasks.Help.run(["nova.new"])
-      {_opts, [base_path|_]} ->
+      {opts, [base_path|_]} ->
+        IO.puts("Creating Nova project at '#{base_path}'...")
+        IO.puts("Using options: #{inspect(opts)}")
         project_path = Path.expand(base_path)
         appname = Path.basename(project_path)
         ## Start create the structure
@@ -43,23 +47,55 @@ defmodule Mix.Tasks.Nova.New do
 
         gen_opts = %{
           app: Macro.camelize(appname),
-          app_mod: appname
+          app_mod: appname,
+          ecto: Keyword.get(opts, :ecto, false)
         }
-        ## Copy the templates
-        add_templates(template_root, [
+        |> maybe_add_ecto_adapter()
+
+        template_files = [
               "mix.exs",
               "config/config.exs",
               "config/dev.exs",
               "config/prod.exs",
               {"app.ex", "lib/#{appname}.ex"},
-              {"router.ex", "lib/router.ex"},
+              {"router.ex", "lib/#{appname}_router.ex"}, ## We need to call it with suffix '_router' for now. Limitation in nova
               {"controller.ex", "lib/controllers/main.ex"},
-            ], gen_opts, project_path)
+        ]
+        |> maybe_add_ecto(opts)
+
+        ## Copy the templates
+        add_templates(template_root, template_files, gen_opts, project_path)
 
         Mix.shell().info(
+          "------------------------------------------------------------------------\n" <>
           "Nova project '#{appname}' created at '#{project_path}'.\n" <>
-            "You can now run `mix deps.get` to install dependencies and `iex -S mix` to start the server."
+            "To start the server just run the following commands:\n" <>
+            IO.ANSI.light_green() <> IO.ANSI.black_background() <> "cd #{appname}/\n" <>
+            "mix deps.get\n" <>
+            "iex -S mix\n" <> IO.ANSI.reset() <>
+            "------------------------------------------------------------------------"
         )
+    end
+  end
+
+  defp maybe_add_ecto_adapter(opts) do
+    case Map.get(opts, :ecto_adapter, "postgres") do
+      "postgres" ->
+        opts
+        |> Map.put(:ecto_adapter_mod, "postgrex")
+        |> Map.put(:ecto_adapter, "Postgres")
+      _ ->
+        opts
+    end
+  end
+
+  defp maybe_add_ecto(template_files, opts) do
+    if(Keyword.get(opts, :ecto, false)) do
+      template_files ++ [
+        {"repo.ex", "lib/repo.ex"}
+      ]
+    else
+      template_files
     end
   end
 

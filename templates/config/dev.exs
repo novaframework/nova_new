@@ -1,5 +1,15 @@
 import Config
 
+<%= if assigns.ecto do %>
+config :<%= assigns.app_mod %>, ecto_repos: [<%= assigns.app %>.Repo]
+
+config :<%= assigns.app_mod %>, <%= assigns.app %>.Repo,
+  hostname: "localhost",
+  username: "",
+  password: "",
+  port: 5432,
+  database: "<%= assigns.app_mod %>_dev"
+<% end %>
 config :nova,
   environment: :dev,
   cowboy_configuration: %{
