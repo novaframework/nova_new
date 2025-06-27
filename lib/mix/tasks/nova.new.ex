@@ -58,7 +58,7 @@ defmodule Mix.Tasks.Nova.New do
               "config/dev.exs",
               "config/prod.exs",
               {"app.ex", "lib/#{appname}.ex"},
-              {"router.ex", "lib/#{appname}_router.ex"}, ## We need to call it with suffix '_router' for now. Limitation in nova
+              {"router.ex", "lib/#{appname}.router.ex"}, ## We need to call it with suffix '_router' for now. Limitation in nova
               {"controller.ex", "lib/controllers/main.ex"},
         ]
         |> maybe_add_ecto(opts)

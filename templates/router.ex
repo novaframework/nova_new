@@ -1,4 +1,4 @@
-defmodule <%= assigns.app %>_router do
+defmodule <%= assigns.app %>.Router do
 
   def routes(:dev) do
     [%{
